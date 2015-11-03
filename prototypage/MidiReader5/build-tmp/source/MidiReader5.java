@@ -13,6 +13,8 @@ import java.io.IOException;
 import javax.sound.midi.InvalidMidiDataException; 
 import org.jfugue.midi.MidiFileManager; 
 import org.jfugue.midi.MidiParserListener; 
+import org.jfugue.parser.ParserListenerAdapter; 
+import org.jfugue.theory.Note; 
 
 import java.util.HashMap; 
 import java.util.ArrayList; 
@@ -23,7 +25,10 @@ import java.io.InputStream;
 import java.io.OutputStream; 
 import java.io.IOException; 
 
-public class MidiReader3 extends PApplet {
+public class MidiReader5 extends PApplet {
+
+
+
 
 
 
@@ -42,7 +47,6 @@ private static final long TEMPORAL_DELAY = 0;
 File midiFile = new File(dataPath("/Users/fbonnamy/Documents/pro/WIW/MusicalLetter/prototypage/MidiReader/data/WIW_NOEL_test_midi.mid"));
 
 public void setup() {
-  
     try {
       Pattern pattern = MidiFileManager.loadPatternFromMidi(midiFile);
       // System.out.println(pattern);
@@ -53,20 +57,27 @@ public void setup() {
       parser.parse(pattern);
 
       // Part 2. Send the events from Part 1, and play the original pattern with a delay
-      MidiParserListener dpl = new MidiParserListener(); // Or your AnimationParserListener!
+      CustomParser dpl = new CustomParser(); // Or your AnimationParserListener!
       plp.addParserListener(dpl);
+
       new Player().delayPlay(TEMPORAL_DELAY, pattern);
       plp.parse();
     } catch(Exception e) {}
+}
 
-   
+class CustomParser extends ParserListenerAdapter {
+    public int counter;
 
+    @Override
+    public void onNoteParsed(Note note) {
+        println("note: "+note);
+    }
 }
 
 // midiFile = new File(dataPath("/Users/fbonnamy/Documents/pro/WIW/MusicalLetter/prototypage/MidiReader/data/WIW_NOEL_test_midi.mid"));
 
   static public void main(String[] passedArgs) {
-    String[] appletArgs = new String[] { "MidiReader3" };
+    String[] appletArgs = new String[] { "MidiReader5" };
     if (passedArgs != null) {
       PApplet.main(concat(appletArgs, passedArgs));
     } else {
