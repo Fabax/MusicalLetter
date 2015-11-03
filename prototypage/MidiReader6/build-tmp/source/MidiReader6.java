@@ -15,6 +15,8 @@ import org.jfugue.midi.MidiFileManager;
 import org.jfugue.midi.MidiParserListener; 
 import org.jfugue.parser.ParserListenerAdapter; 
 import org.jfugue.theory.Note; 
+import org.staccato.maps.SolfegeReplacementMap; 
+import org.staccato.ReplacementMapPreprocessor; 
 
 import java.util.HashMap; 
 import java.util.ArrayList; 
@@ -25,7 +27,12 @@ import java.io.InputStream;
 import java.io.OutputStream; 
 import java.io.IOException; 
 
-public class MidiReader5 extends PApplet {
+public class MidiReader6 extends PApplet {
+
+
+
+
+
 
 
 
@@ -76,7 +83,7 @@ class CustomParser extends ParserListenerAdapter {
 // midiFile = new File(dataPath("/Users/fbonnamy/Documents/pro/WIW/MusicalLetter/prototypage/MidiReader/data/WIW_NOEL_test_midi.mid"));
 
   static public void main(String[] passedArgs) {
-    String[] appletArgs = new String[] { "MidiReader5" };
+    String[] appletArgs = new String[] { "MidiReader6" };
     if (passedArgs != null) {
       PApplet.main(concat(appletArgs, passedArgs));
     } else {
