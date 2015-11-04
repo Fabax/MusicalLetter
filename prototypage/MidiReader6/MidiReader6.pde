@@ -17,7 +17,6 @@ import org.staccato.ReplacementMapPreprocessor;
 private static final long TEMPORAL_DELAY = 0;
 Player player;
 File midiFile = new File(dataPath("/Users/fbonnamy/Documents/pro/WIW/MusicalLetter/prototypage/MidiReader/data/WIW_NOEL_test_midi.mid"));
-Pattern pattern;
 
 void setup() {
       player = new Player();
@@ -32,13 +31,13 @@ void setup() {
       parser.parse(pattern);
 
       // Part 2. Send the events from Part 1, and play the original pattern with a delay
-      CustomParser dpl = new CustomParser(); // Or your AnimationParserListener!
+      CustomParser dpl = new CustomParser(player); // Or your AnimationParserListener!
       plp.addParserListener(dpl);
 
-      plp.parse();
+      
       player.delayPlay(TEMPORAL_DELAY, pattern);
+      plp.parse();
     } catch(Exception e) {}
-    
 }
 
 void draw(){
@@ -48,14 +47,14 @@ void draw(){
 class CustomParser extends ParserListenerAdapter{
 
     
-    CustomParser(){
-      println("constructeur: ");
+    CustomParser(Player player){ 
+      println("lol: ");
     }//Fin de la méthode main
 
     @Override
-    public void onNoteParsed(Note note) {        
+    public void onNoteParsed(Note note) {
         println("-----------------------------------");
-        
+        println("player.: "+player.getSequencePosition());
         println("note value: "+note.getValue());
         println("note duration: "+note.getDuration());
         println("note getToneString: "+note.getToneString(note.getValue()));

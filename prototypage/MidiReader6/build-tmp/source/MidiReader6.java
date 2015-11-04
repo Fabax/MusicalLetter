@@ -48,7 +48,6 @@ public class MidiReader6 extends PApplet {
 private static final long TEMPORAL_DELAY = 0;
 Player player;
 File midiFile = new File(dataPath("/Users/fbonnamy/Documents/pro/WIW/MusicalLetter/prototypage/MidiReader/data/WIW_NOEL_test_midi.mid"));
-Pattern pattern;
 
 public void setup() {
       player = new Player();
@@ -63,14 +62,13 @@ public void setup() {
       parser.parse(pattern);
 
       // Part 2. Send the events from Part 1, and play the original pattern with a delay
-      CustomParser dpl = new CustomParser(); // Or your AnimationParserListener!
+      CustomParser dpl = new CustomParser(player); // Or your AnimationParserListener!
       plp.addParserListener(dpl);
 
       
-      
+      // player.delayPlay(TEMPORAL_DELAY, pattern);
       plp.parse();
     } catch(Exception e) {}
-    // player.delayPlay(TEMPORAL_DELAY, pattern);
 }
 
 public void draw(){
@@ -80,8 +78,8 @@ public void draw(){
 class CustomParser extends ParserListenerAdapter{
 
     
-    CustomParser(){
-      println("constructeur: ");
+    CustomParser(Player player){ 
+      println("lol: ");
     }//Fin de la m\u00e9thode main
 
     @Override
