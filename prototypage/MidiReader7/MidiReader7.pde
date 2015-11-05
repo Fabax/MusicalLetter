@@ -1,17 +1,33 @@
-MidiController test;
-Player player = new Player();
+MidiController midiController;
+PhotoAnalizer analizer; 
 
 void setup() {
-    test = new MidiController();
+	size(900, 540);
+    midiController = new MidiController();
+    analizer = new PhotoAnalizer(0, this);
 }
 
 void draw() {
-    // test.playingMidi(player);
+    // midiController.playingMidi(player);
+     analizer.render();
 }
 
 void keyPressed() {
     if(key == 'a' || key == 'A'){
-        test.assemblePattern();
-        test.playingMidi(player);
+        // midiController.assemblePattern();
+        for (int i = 1; i <= 3; ++i) {
+        	midiController.playingMidi(i);
+        }
     }
+    if(key == 'c' || key == 'C'){
+	    analizer.startAnalizise();
+	}
+
+	if(key == 'b' || key == 'B'){
+	    float blackPixels = analizer.getBlackPixels();
+	    println("blackPixels: "+blackPixels);
+	}
+
+
+	
 }

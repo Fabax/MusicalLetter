@@ -14,7 +14,7 @@ import java.io.InputStream;
 import java.io.OutputStream; 
 import java.io.IOException; 
 
-public class MusicalLetter extends PApplet {
+public class DrawingScanner extends PApplet {
 
 
 Capture cam;
@@ -43,7 +43,7 @@ public void setup() {
 
     // The camera can be initialized directly using an element
     // from the array returned by list():
-    cam = new Capture(this, cameras[18]);
+    cam = new Capture(this, cameras[0]);
     // Or, the settings can be defined based on the text in the list
     //cam = new Capture(this, 640, 480, "Built-in iSight", 30);
     // Start capturing the images from the camera
@@ -99,7 +99,7 @@ public void keyPressed() {
   }
 }
   static public void main(String[] passedArgs) {
-    String[] appletArgs = new String[] { "MusicalLetter" };
+    String[] appletArgs = new String[] { "DrawingScanner" };
     if (passedArgs != null) {
       PApplet.main(concat(appletArgs, passedArgs));
     } else {

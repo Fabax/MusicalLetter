@@ -17,6 +17,7 @@ import org.jfugue.parser.ParserListenerAdapter;
 import org.jfugue.theory.Note; 
 import org.staccato.maps.SolfegeReplacementMap; 
 import org.staccato.ReplacementMapPreprocessor; 
+import processing.video.*; 
 
 import java.util.HashMap; 
 import java.util.ArrayList; 
@@ -29,23 +30,112 @@ import java.io.IOException;
 
 public class MidiReader7 extends PApplet {
 
-MidiController test;
-Player player = new Player();
+MidiController midiController;
+PhotoAnalizer analizer; 
 
 public void setup() {
-    test = new MidiController();
+	size(900, 540);
+    midiController = new MidiController();
+    analizer = new PhotoAnalizer(0, this);
 }
 
 public void draw() {
-    // test.playingMidi(player);
+    // midiController.playingMidi(player);
+     analizer.render();
 }
 
 public void keyPressed() {
     if(key == 'a' || key == 'A'){
-        test.assemblePattern();
-        test.playingMidi(player);
+        // midiController.assemblePattern();
+        for (int i = 1; i <= 3; ++i) {
+        	midiController.playingMidi(i);
+        }
     }
+    if(key == 'c' || key == 'C'){
+	    analizer.startAnalizise();
+	}
+
+	if(key == 'b' || key == 'B'){
+	    float blackPixels = analizer.getBlackPixels();
+	    println("blackPixels: "+blackPixels);
+	}
+
+
+	
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+// import org.apache.commons.io.FilenameUtils;
+
+public class MidiController {
+
+  private static final long   TEMPORAL_DELAY = 0;
+  File dir;
+  String[] list;
+  // Pattern[] patterns;
+  Pattern finalPattern;
+  boolean isMidi;
+
+  File testMidiFile;
+  Pattern testPattern;
+
+  MidiController(){
+    println("MidiController");
+
+    dir = new File("/Users/fbonnamy/Documents/pro/WIW/MusicalLetter/prototypage/MidiReader7/midi/");
+    list = dir.list();
+  }
+
+
+  public void playingMidi(int index){
+    Player player = new Player();
+    // println("--------------------------------");
+    // println("playingMidi : "+index);
+
+    Pattern pattern = new Pattern(); 
+      try {
+         finalPattern = new Pattern();
+        for (int i = 0; i < list.length; ++i) {
+            isMidi = list[i].contains("mid");
+            if(isMidi){
+                if(i == index){
+                  File midiFile = new File(dataPath("/Users/fbonnamy/Documents/pro/WIW/MusicalLetter/prototypage/MidiReader7/midi/"+list[i]));
+                  pattern =  MidiFileManager.loadPatternFromMidi(midiFile);
+                }
+            }
+        }
+
+        StaccatoParser parser = new StaccatoParser();
+        TemporalPLP plp = new TemporalPLP();
+        parser.addParserListener(plp);
+        parser.parse(pattern);
+        // Part 2. Send the events from Part 1, and play the original pattern with a delay
+        CustomParser dpl = new CustomParser(); // Or your AnimationParserListener!
+        plp.addParserListener(dpl);
+        player.delayPlay(TEMPORAL_DELAY, pattern);
+        plp.parse();
+
+      } catch(Exception e) {
+        println("erreur: "+e);
+      }
+  }
+}
+
+
 class CustomParser extends ParserListenerAdapter{
 
     CustomParser(){ 
@@ -80,52 +170,88 @@ class CustomParser extends ParserListenerAdapter{
 }
 
 
+public class PhotoAnalizer {
+
+	float blackPixels = 0;
+	Capture cam;
+	String[] cameras;
+	PImage source;       // Source image
+	PImage destination;  // Destination image
+	float threshold = 127;
+	boolean isCamDisplayed = true;
+
+	public PhotoAnalizer (int cameraNumber, PApplet _that) {
+		cameras = Capture.list();
+
+		if (cameras == null) {
+			println("Failed to retrieve the list of available cameras, will try the default...");
+			// cam = new Capture(_that, 640, 480);
+		}
+
+		if (cameras.length == 0) {
+			// println("There are no cameras available for capture.");
+			exit();
+		} else {
+			println("Available cameras:");
+			// for (int i = 0; i < cameras.length; i++) {
+			//   println(i + "" + cameras[i]);
+			// }
+
+			cam = new Capture(_that, cameras[cameraNumber]);
+			cam.start();
+		}
+	}
+
+	public void render(){
+		 if (cam.available() == true) {
+		    cam.read();
+		  }
+		  if(isCamDisplayed){
+		    image(cam, 0, 0);  
+		  }
+	}
+
+	public void startAnalizise(){
+		cam.save("data/capture.jpg");
+	    isCamDisplayed = false;
+	    blackPixels = 0; 
+
+	    source = loadImage("data/capture.jpg");  
+	    destination = createImage(source.width, source.height, RGB);
 
 
+	    source.loadPixels();
+	    destination.loadPixels();
 
+	    for (int x = 0; x < source.width; x++) {
+	      for (int y = 0; y < source.height; y++ ) {
+	        int loc = x + y*source.width;
+	        // Test the brightness against the threshold
+	        if (brightness(source.pixels[loc]) > threshold) {
+	          destination.pixels[loc]  = color(255);  // White
+	        }  else {
+	          destination.pixels[loc]  = color(0);    // Black
+	          blackPixels ++;
+	        }
+	      }
+	    }
 
+	    float base = source.width*source.height;
+	   
 
+	  
+	  
 
+	    // We changed the pixels in destination
+	    destination.updatePixels();
+	    // Display the destination
+	    image(destination,0,0);
+	}
 
-
-
-
-
-
-
-
-public class MidiController {
-
-  private static final long   TEMPORAL_DELAY = 0;
-  File midiFile = new File(dataPath("/Users/fbonnamy/Documents/pro/WIW/MusicalLetter/prototypage/MidiReader/data/WIW_NOEL_test_midi.mid"));
-  Pattern pattern;
-
-  public void assemblePattern(){
-      try {
-        pattern = MidiFileManager.loadPatternFromMidi(midiFile);
-      } catch(Exception e) {}
-  }
-
-  public void playingMidi(Player player){
-      try {
-        // System.out.println(pattern);
-        // Part 1. Parse the original music
-        // Pattern pattern = MidiFileManager.loadPatternFromMidi(midiFile);
-        StaccatoParser parser = new StaccatoParser();
-        TemporalPLP plp = new TemporalPLP();
-        parser.addParserListener(plp);
-        parser.parse(pattern);
-
-        // Part 2. Send the events from Part 1, and play the original pattern with a delay
-        CustomParser dpl = new CustomParser(); // Or your AnimationParserListener!
-        plp.addParserListener(dpl);
-        player.delayPlay(TEMPORAL_DELAY, pattern);
-        plp.parse();
-      } catch(Exception e) {}
-  }
+	public float getBlackPixels(){
+		return blackPixels;
+	}
 }
-
-
   static public void main(String[] passedArgs) {
     String[] appletArgs = new String[] { "MidiReader7" };
     if (passedArgs != null) {
