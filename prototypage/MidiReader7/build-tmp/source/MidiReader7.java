@@ -32,6 +32,7 @@ public class MidiReader7 extends PApplet {
 
 MidiController midiController;
 PhotoAnalizer analizer; 
+int[] r = new int[3];
 
 public void setup() {
 	size(900, 540);
@@ -56,12 +57,16 @@ public void keyPressed() {
 	}
 
 	if(key == 'b' || key == 'B'){
-	    float blackPixels = analizer.getBlackPixels();
-	    println("blackPixels: "+blackPixels);
+	    float[] blackPixels = analizer.getBlackPixels();
+
+	    r[0] = (int) random(0, 3);
+	    r[1] = (int) random(4, 6);
+	    r[2] = (int) random(7, 9);
+
+	     for (int i = 1; i <= 3; ++i) {
+        	midiController.playingMidi(r[i]);
+        }
 	}
-
-
-	
 }
 
 
@@ -171,32 +176,32 @@ class CustomParser extends ParserListenerAdapter{
 
 
 public class PhotoAnalizer {
-
-	float blackPixels = 0;
+	float[] blackPixels = new float[3];
 	Capture cam;
 	String[] cameras;
 	PImage source;       // Source image
 	PImage destination;  // Destination image
 	float threshold = 127;
 	boolean isCamDisplayed = true;
+	boolean debug = true;
 
 	public PhotoAnalizer (int cameraNumber, PApplet _that) {
 		cameras = Capture.list();
 
 		if (cameras == null) {
-			println("Failed to retrieve the list of available cameras, will try the default...");
-			// cam = new Capture(_that, 640, 480);
+			if(debug){println("Failed to retrieve the list of available cameras, will try the default...");}
 		}
 
 		if (cameras.length == 0) {
-			// println("There are no cameras available for capture.");
+			if(debug){println("There are no cameras available for capture.");}
 			exit();
 		} else {
-			println("Available cameras:");
-			// for (int i = 0; i < cameras.length; i++) {
-			//   println(i + "" + cameras[i]);
-			// }
-
+			if(debug){
+				println("Available cameras:");
+				for (int i = 0; i < cameras.length; i++) {
+			  		println(i + "" + cameras[i]);
+				}
+			}
 			cam = new Capture(_that, cameras[cameraNumber]);
 			cam.start();
 		}
@@ -207,18 +212,20 @@ public class PhotoAnalizer {
 		    cam.read();
 		  }
 		  if(isCamDisplayed){
-		    image(cam, 0, 0);  
+		    image(cam, 0, 0);
 		  }
 	}
 
 	public void startAnalizise(){
 		cam.save("data/capture.jpg");
 	    isCamDisplayed = false;
-	    blackPixels = 0; 
 
-	    source = loadImage("data/capture.jpg");  
+	    blackPixels[0] = 0;
+	    blackPixels[1] = 0;
+	    blackPixels[2] = 0;
+
+	    source = loadImage("data/capture.jpg");
 	    destination = createImage(source.width, source.height, RGB);
-
 
 	    source.loadPixels();
 	    destination.loadPixels();
@@ -227,20 +234,20 @@ public class PhotoAnalizer {
 	      for (int y = 0; y < source.height; y++ ) {
 	        int loc = x + y*source.width;
 	        // Test the brightness against the threshold
-	        if (brightness(source.pixels[loc]) > threshold) {
-	          destination.pixels[loc]  = color(255);  // White
-	        }  else {
-	          destination.pixels[loc]  = color(0);    // Black
-	          blackPixels ++;
+	        if (brightness(source.pixels[loc]) < threshold) {
+	         	destination.pixels[loc]  = color(0);    // Black
+	         	if(x < (source.width/3)){
+	         		blackPixels[0] ++;
+	         	}else if (x > (source.width/3) && x < ((source.width/3)*2)){
+	         		blackPixels[1] ++;
+	         	}else{
+	         		blackPixels[2] ++;
+	         	}
 	        }
 	      }
 	    }
 
 	    float base = source.width*source.height;
-	   
-
-	  
-	  
 
 	    // We changed the pixels in destination
 	    destination.updatePixels();
@@ -248,7 +255,7 @@ public class PhotoAnalizer {
 	    image(destination,0,0);
 	}
 
-	public float getBlackPixels(){
+	public float[] getBlackPixels(){
 		return blackPixels;
 	}
 }

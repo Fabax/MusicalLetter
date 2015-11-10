@@ -1,5 +1,6 @@
 MidiController midiController;
 PhotoAnalizer analizer; 
+int[] r = new int[3];
 
 void setup() {
 	size(900, 540);
@@ -24,10 +25,14 @@ void keyPressed() {
 	}
 
 	if(key == 'b' || key == 'B'){
-	    float blackPixels = analizer.getBlackPixels();
-	    println("blackPixels: "+blackPixels);
+	    float[] blackPixels = analizer.getBlackPixels();
+
+	    r[0] = (int) random(0, 3);
+	    r[1] = (int) random(4, 6);
+	    r[2] = (int) random(7, 9);
+
+	     for (int i = 0; i < 3; ++i) {
+        	midiController.playingMidi(r[i]);
+              }
 	}
-
-
-	
 }
