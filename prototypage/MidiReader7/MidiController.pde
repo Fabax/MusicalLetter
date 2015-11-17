@@ -58,6 +58,7 @@ public class MidiController {
         TemporalPLP plp = new TemporalPLP();
         parser.addParserListener(plp);
         parser.parse(pattern);
+        
         // Part 2. Send the events from Part 1, and play the original pattern with a delay
         CustomParser dpl = new CustomParser(); // Or your AnimationParserListener!
         plp.addParserListener(dpl);

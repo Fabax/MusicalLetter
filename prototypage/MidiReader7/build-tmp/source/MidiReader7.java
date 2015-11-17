@@ -63,9 +63,9 @@ public void keyPressed() {
 	    r[1] = (int) random(4, 6);
 	    r[2] = (int) random(7, 9);
 
-	     for (int i = 1; i <= 3; ++i) {
+	     for (int i = 0; i < 3; ++i) {
         	midiController.playingMidi(r[i]);
-        }
+              }
 	}
 }
 
@@ -128,6 +128,7 @@ public class MidiController {
         TemporalPLP plp = new TemporalPLP();
         parser.addParserListener(plp);
         parser.parse(pattern);
+        partser.getTrackBeatTime();
         // Part 2. Send the events from Part 1, and play the original pattern with a delay
         CustomParser dpl = new CustomParser(); // Or your AnimationParserListener!
         plp.addParserListener(dpl);
@@ -149,12 +150,11 @@ class CustomParser extends ParserListenerAdapter{
 
     @Override
     public void onNoteParsed(Note note) {        
-        // println("-----------------------------------");
-        // println("note value: "+note.getValue());
-        // println("note duration: "+note.getDuration());
-        // println("note getToneString: "+note.getToneString(note.getValue()));
-        // println("note getToneStringWithoutOctave: "+note.getToneStringWithoutOctave(note.getValue()));
-        
+         println("-----------------------------------");
+        println("note value: "+note.getValue());
+         println("note duration: "+note.getDuration());
+         println("note getToneString: "+note.getToneString(note.getValue()));
+         println("note getToneStringWithoutOctave: "+note.getToneStringWithoutOctave(note.getValue()));
     }
 
     @Override
@@ -217,7 +217,7 @@ public class PhotoAnalizer {
 	}
 
 	public void startAnalizise(){
-		cam.save("data/capture.jpg");
+	    cam.save("data/capture.jpg");
 	    isCamDisplayed = false;
 
 	    blackPixels[0] = 0;
@@ -235,7 +235,9 @@ public class PhotoAnalizer {
 	        int loc = x + y*source.width;
 	        // Test the brightness against the threshold
 	        if (brightness(source.pixels[loc]) < threshold) {
-	         	destination.pixels[loc]  = color(0);    // Black
+	          destination.pixels[loc]  = color(255);  // White
+	        }  else {
+	        	destination.pixels[loc]  = color(0);    // Black
 	         	if(x < (source.width/3)){
 	         		blackPixels[0] ++;
 	         	}else if (x > (source.width/3) && x < ((source.width/3)*2)){

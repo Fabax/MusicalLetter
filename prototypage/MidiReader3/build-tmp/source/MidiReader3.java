@@ -53,8 +53,9 @@ public void setup() {
       parser.parse(pattern);
 
       // Part 2. Send the events from Part 1, and play the original pattern with a delay
-      MidiParserListener dpl = new MidiParserListener(); // Or your AnimationParserListener!
+      DiagnosticParserListener dpl = new DiagnosticParserListener(); // Or your AnimationParserListener!
       plp.addParserListener(dpl);
+
       new Player().delayPlay(TEMPORAL_DELAY, pattern);
       plp.parse();
     } catch(Exception e) {}
